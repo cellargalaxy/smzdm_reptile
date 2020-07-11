@@ -29,10 +29,10 @@ if [ -z $sleep ];then
 fi
 
 if [ -z $listenPort ];then
-    read -p "please enter listen port(default:8080):" listenPort
+    read -p "please enter listen port(default:8088):" listenPort
 fi
 if [ -z $listenPort ];then
-    listenPort="8080"
+    listenPort="8088"
 fi
 
 while :
@@ -40,7 +40,7 @@ do
     if [ ! -z $wxPushAddress ];then
         break
     fi
-    read -s -p "please enter wx push address(required):" wxPushAddress
+    read -p "please enter wx push address(required):" wxPushAddress
 done
 
 echo 'retry:'$retry
@@ -60,7 +60,7 @@ echo 'docker run'
 docker run -d \
 --restart=always \
 --name smzdm_reptile \
--p $listenPort:8080 \
+-p $listenPort:8088 \
 -e RETRY=$retry \
 -e MAX_PAGE=$maxPage \
 -e TIMEOUT=$timeout \

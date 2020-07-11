@@ -21,7 +21,7 @@ const (
 	defaultTimeout       = defaultTimeoutSecond * time.Second
 	defaultSleepSecond   = 2
 	defaultSleep         = defaultSleepSecond * time.Second
-	defaultListenAddress = ":8080"
+	defaultListenAddress = ":8088"
 	defaultWxPushAddress = ""
 )
 
