@@ -40,11 +40,11 @@
 
                     error: ajaxErrorDeal,
                     success: function (data) {
-                        if (data.status == 1) {
+                        if (data.code == 1) {
                             alert('修改成功')
                             app.listSearchCondition()
                         } else {
-                            alert('修改失败: ' + data.massage)
+                            alert('修改失败: ' + data.message)
                         }
                     }
                 });
