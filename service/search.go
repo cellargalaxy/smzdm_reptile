@@ -147,40 +147,48 @@ func searchGoods(searchCondition model.SearchCondition) ([]model.Goods, error) {
 		}
 
 		for _, goods := range gs {
-			if goods.Price < searchCondition.MinPrice || goods.Price > searchCondition.MaxPrice {
-				logrus.WithFields(logrus.Fields{"MinPrice": searchCondition.MinPrice, "Price": goods.Price, "MaxPrice": searchCondition.MaxPrice, "url": goods.Url}).Info("商品【价格】不在范围内")
-				continue
+			if isMeetCondition(goods, searchCondition, titleContainRegular, titleExcludeRegular, merchantContainRegular, merchantExcludeRegular) {
+				goodses = append(goodses, goods)
 			}
-			if goods.Zhi < searchCondition.MinZhi {
-				logrus.WithFields(logrus.Fields{"Zhi": goods.Zhi, "MinZhi": searchCondition.MinZhi, "url": goods.Url}).Info("商品【值】不在范围内")
-				continue
-			}
-			if goods.Buzhi > searchCondition.MaxBuzhi {
-				logrus.WithFields(logrus.Fields{"Buzhi": goods.Buzhi, "MaxBuzhi": searchCondition.MaxBuzhi, "url": goods.Url}).Info("商品【不值】不在范围内")
-				continue
-			}
-			if titleContainRegular != nil && !titleContainRegular.MatchString(goods.Title) {
-				logrus.WithFields(logrus.Fields{"Title": goods.Title, "TitleContain": searchCondition.TitleContain, "url": goods.Url}).Info("【标题】被包含正则过滤")
-				continue
-			}
-			if titleExcludeRegular != nil && titleExcludeRegular.MatchString(goods.Title) {
-				logrus.WithFields(logrus.Fields{"Title": goods.Title, "TitleExclude": searchCondition.TitleExclude, "url": goods.Url}).Info("【标题】被排除正则过滤")
-				continue
-			}
-			if merchantContainRegular != nil && !merchantContainRegular.MatchString(goods.Merchant) {
-				logrus.WithFields(logrus.Fields{"Merchant": goods.Merchant, "MerchantContain": searchCondition.MerchantContain, "url": goods.Url}).Info("【商家】被包含正则过滤")
-				continue
-			}
-			if merchantExcludeRegular != nil && merchantExcludeRegular.MatchString(goods.Merchant) {
-				logrus.WithFields(logrus.Fields{"Merchant": goods.Merchant, "MerchantExclude": searchCondition.MerchantExclude, "url": goods.Url}).Info("【商家】被排除正则过滤")
-				continue
-			}
-			goodses = append(goodses, goods)
 		}
 
 		time.Sleep(config.Sleep)
 	}
 	return goodses, nil
+}
+
+func isMeetCondition(goods model.Goods, searchCondition model.SearchCondition,
+	titleContainRegular *regexp.Regexp, titleExcludeRegular *regexp.Regexp,
+	merchantContainRegular *regexp.Regexp, merchantExcludeRegular *regexp.Regexp) bool {
+	if goods.Price < searchCondition.MinPrice || goods.Price > searchCondition.MaxPrice {
+		logrus.WithFields(logrus.Fields{"MinPrice": searchCondition.MinPrice, "Price": goods.Price, "MaxPrice": searchCondition.MaxPrice, "url": goods.Url}).Info("商品【价格】不在范围内")
+		return false
+	}
+	if goods.Zhi < searchCondition.MinZhi {
+		logrus.WithFields(logrus.Fields{"Zhi": goods.Zhi, "MinZhi": searchCondition.MinZhi, "url": goods.Url}).Info("商品【值】不在范围内")
+		return false
+	}
+	if goods.Buzhi > searchCondition.MaxBuzhi {
+		logrus.WithFields(logrus.Fields{"Buzhi": goods.Buzhi, "MaxBuzhi": searchCondition.MaxBuzhi, "url": goods.Url}).Info("商品【不值】不在范围内")
+		return false
+	}
+	if titleContainRegular != nil && !titleContainRegular.MatchString(goods.Title) {
+		logrus.WithFields(logrus.Fields{"Title": goods.Title, "TitleContain": searchCondition.TitleContain, "url": goods.Url}).Info("【标题】被包含正则过滤")
+		return false
+	}
+	if titleExcludeRegular != nil && titleExcludeRegular.MatchString(goods.Title) {
+		logrus.WithFields(logrus.Fields{"Title": goods.Title, "TitleExclude": searchCondition.TitleExclude, "url": goods.Url}).Info("【标题】被排除正则过滤")
+		return false
+	}
+	if merchantContainRegular != nil && !merchantContainRegular.MatchString(goods.Merchant) {
+		logrus.WithFields(logrus.Fields{"Merchant": goods.Merchant, "MerchantContain": searchCondition.MerchantContain, "url": goods.Url}).Info("【商家】被包含正则过滤")
+		return false
+	}
+	if merchantExcludeRegular != nil && merchantExcludeRegular.MatchString(goods.Merchant) {
+		logrus.WithFields(logrus.Fields{"Merchant": goods.Merchant, "MerchantExclude": searchCondition.MerchantExclude, "url": goods.Url}).Info("【商家】被排除正则过滤")
+		return false
+	}
+	return true
 }
 
 //分析商品列表页面
