@@ -14,7 +14,7 @@ type SearchCondition struct {
 	MerchantContain string  `json:"merchantContain"`
 	MerchantExclude string  `json:"merchantExclude"`
 	WxTemplateId    string  `json:"wxTemplateId"`
-	WxTagId         string  `json:"wxTagId"`
+	WxTagId         int     `json:"wxTagId"`
 }
 
 type Goods struct {

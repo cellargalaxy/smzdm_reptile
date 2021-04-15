@@ -46,7 +46,7 @@ func searchAndSend(searchCondition model.SearchCondition) bool {
 			continue
 		}
 		addSentGoods(searchCondition, goods)
-		data := map[string]string{
+		data := map[string]interface{}{
 			"id":       searchCondition.SearchId,
 			"title":    goods.Title,
 			"price":    fmt.Sprint(goods.Price),
@@ -54,7 +54,7 @@ func searchAndSend(searchCondition model.SearchCondition) bool {
 			"buzhi":    fmt.Sprint(goods.Buzhi),
 			"merchant": goods.Merchant,
 		}
-		sendWxPush(searchCondition.WxTemplateId, searchCondition.WxTagId, goods.Url, data)
+		SendWxPush(searchCondition.WxTemplateId, searchCondition.WxTagId, goods.Url, data)
 	}
 	return true
 }
@@ -71,7 +71,7 @@ func isSentGoods(searchCondition model.SearchCondition, newGoods model.Goods) bo
 		delete(sentGoodsMap, expiredKey)
 	}
 
-	newKey := searchCondition.WxTagId + ":" + newGoods.Url
+	newKey := fmt.Sprintf("%+v:%+v", searchCondition.WxTagId, newGoods.Url)
 	for key := range sentGoodsMap {
 		if newKey == key {
 			return true
@@ -81,7 +81,7 @@ func isSentGoods(searchCondition model.SearchCondition, newGoods model.Goods) bo
 }
 
 func addSentGoods(searchCondition model.SearchCondition, newGoods model.Goods) {
-	newKey := searchCondition.WxTagId + ":" + newGoods.Url
+	newKey := fmt.Sprintf("%+v:%+v", searchCondition.WxTagId, newGoods.Url)
 	sentGoodsMap[newKey] = newGoods
 }
 

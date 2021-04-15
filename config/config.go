@@ -23,6 +23,7 @@ const (
 	defaultSleep         = defaultSleepSecond * time.Second
 	defaultListenAddress = ":8088"
 	defaultWxPushAddress = ""
+	defaultWxToken       = ""
 )
 
 var Retry = defaultRetry
@@ -31,6 +32,7 @@ var Timeout = defaultTimeout
 var Sleep = defaultSleep
 var ListenAddress = defaultListenAddress
 var WxPushAddress = defaultWxPushAddress
+var WxToken = defaultWxToken
 
 func init() {
 	logrus.Info("加载配置开始")
@@ -43,6 +45,7 @@ func init() {
 		Sleep = time.Duration(configFile.Section("").Key("sleep").MustInt(defaultSleepSecond)) * time.Second
 		ListenAddress = configFile.Section("").Key("listenAddress").MustString(defaultListenAddress)
 		WxPushAddress = configFile.Section("").Key("wxPushAddress").MustString(defaultWxPushAddress)
+		WxToken = configFile.Section("").Key("wxToken").MustString(defaultWxToken)
 	} else {
 		logrus.WithFields(logrus.Fields{"err": err}).Error("加载配置文件失败")
 	}
@@ -87,10 +90,17 @@ func init() {
 		WxPushAddress = wxPushAddress
 	}
 
+	wxToken := os.Getenv("WX_TOKEN")
+	logrus.WithFields(logrus.Fields{"wxToken": wxToken}).Info("环境变量读取配置WxToken")
+	if wxPushAddress != "" {
+		WxToken = wxToken
+	}
+
 	logrus.WithFields(logrus.Fields{"Retry": Retry}).Info("配置Retry")
 	logrus.WithFields(logrus.Fields{"MaxPage": MaxPage}).Info("配置MaxPage")
 	logrus.WithFields(logrus.Fields{"Timeout": Timeout}).Info("配置Timeout")
 	logrus.WithFields(logrus.Fields{"Sleep": Sleep}).Info("配置Sleep")
 	logrus.WithFields(logrus.Fields{"ListenAddress": ListenAddress}).Info("配置ListenAddress")
 	logrus.WithFields(logrus.Fields{"WxPushAddress": WxPushAddress}).Info("配置WxPushAddress")
+	logrus.WithFields(logrus.Fields{"WxToken": WxToken}).Info("配置WxToken")
 }

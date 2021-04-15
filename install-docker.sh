@@ -43,12 +43,21 @@ do
     read -p "please enter wx push address(required):" wxPushAddress
 done
 
+while :
+do
+    if [ ! -z $wxToken ];then
+        break
+    fi
+    read -p "please enter wx token(required):" wxToken
+done
+
 echo 'retry:'$retry
 echo 'maxPage:'$maxPage
 echo 'timeout:'$timeout
 echo 'sleep:'$sleep
 echo 'listenPort:'$listenPort
 echo 'wxPushAddress:'$wxPushAddress
+echo 'wxToken:'$wxToken
 echo 'input any key go on,or control+c over'
 read
 
@@ -66,6 +75,7 @@ docker run -d \
 -e TIMEOUT=$timeout \
 -e SLEEP=$sleep \
 -e WX_PUSH_ADDRESS=$wxPushAddress \
+-e WX_TOKEN=$wxToken \
 -v smzdm_reptile:/resources \
 smzdm_reptile
 
