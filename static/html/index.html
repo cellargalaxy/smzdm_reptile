@@ -32,7 +32,7 @@
                     return
                 }
                 $.ajax({
-                    url: 'saveSearchConditions',
+                    url: './saveSearchConditions',
                     type: 'post',
                     data: {"searchConditions": app.searchConditionString},
                     contentType: "application/x-www-form-urlencoded",
@@ -51,7 +51,7 @@
             },
             listSearchCondition: function () {
                 $.ajax({
-                    url: 'listSearchCondition',
+                    url: './listSearchCondition',
                     type: 'get',
                     data: {},
                     contentType: "application/x-www-form-urlencoded",
