@@ -1,29 +1,29 @@
 package controller
 
 import (
+	"github.com/cellargalaxy/go_common/util"
 	"github.com/cellargalaxy/smzdm-reptile/config"
 	"github.com/cellargalaxy/smzdm-reptile/service"
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
 func StartWebService() {
-	logrus.Info("开始web服务")
 	engine := gin.Default()
+	engine.Use(util.GinLogId)
+	engine.Use(util.GinLog)
 	engine.GET("/", func(context *gin.Context) {
 		context.Header("Content-Type", "text/html; charset=utf-8")
 		context.String(200, indexHtmlString)
 	})
 	engine.GET("/listSearchCondition", func(context *gin.Context) {
-		context.JSON(http.StatusOK, createResponse(service.ListSearchCondition()))
+		context.JSON(http.StatusOK, createResponse(service.ListSearchCondition(context)))
 	})
 	engine.POST("/saveSearchConditions", func(context *gin.Context) {
 		searchConditionsJsonString := context.PostForm("searchConditions")
-		context.JSON(http.StatusOK, createResponse(nil, service.AddSearchConditions(searchConditionsJsonString)))
+		context.JSON(http.StatusOK, createResponse(nil, service.AddSearchConditions(context, searchConditionsJsonString)))
 	})
 	engine.Run(config.ListenAddress)
-	defer logrus.Info("结束web服务")
 }
 
 func createResponse(data interface{}, err error) map[string]interface{} {

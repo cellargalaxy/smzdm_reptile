@@ -1,8 +1,10 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/cellargalaxy/go_common/util"
 	"github.com/cellargalaxy/smzdm-reptile/config"
 	"github.com/cellargalaxy/smzdm-reptile/dao"
 	"github.com/cellargalaxy/smzdm-reptile/model"
@@ -16,36 +18,38 @@ import (
 
 var sentGoodsMap = make(map[string]model.Goods)
 
-func StartSearchService() {
-	logrus.Info("开始搜索服务")
+func StartSearchService(ctx context.Context) {
+	logrus.WithContext(ctx).Info("开始搜索服务")
 	for {
-		searchConditions, err := dao.SelectSearchConditions()
+		ctx := context.Background()
+		ctx = util.SetLogId(ctx)
+		searchConditions, err := dao.SelectSearchConditions(ctx)
 		if err != nil {
 			time.Sleep(config.Sleep)
 			continue
 		}
 		for _, searchCondition := range searchConditions {
-			if !searchAndSend(searchCondition) {
-				logrus.WithFields(logrus.Fields{"searchCondition": searchCondition}).Error("搜索或者发送商品失败")
+			if !searchAndSend(ctx, searchCondition) {
+				logrus.WithContext(ctx).WithFields(logrus.Fields{"searchCondition": searchCondition}).Error("搜索或者发送商品失败")
 			}
 			time.Sleep(config.Sleep)
 		}
 		time.Sleep(config.Sleep)
 	}
-	logrus.Info("结束搜索服务")
+	logrus.WithContext(ctx).Info("结束搜索服务")
 }
 
-func searchAndSend(searchCondition model.SearchCondition) bool {
-	goodses, err := searchGoods(searchCondition)
+func searchAndSend(ctx context.Context, searchCondition model.SearchCondition) bool {
+	goodses, err := searchGoods(ctx, searchCondition)
 	if err != nil {
 		return false
 	}
 
 	for _, goods := range goodses {
-		if isSentGoods(searchCondition, goods) {
+		if isSentGoods(ctx, searchCondition, goods) {
 			continue
 		}
-		addSentGoods(searchCondition, goods)
+		addSentGoods(ctx, searchCondition, goods)
 		data := map[string]interface{}{
 			"id":       searchCondition.SearchId,
 			"title":    goods.Title,
@@ -54,12 +58,12 @@ func searchAndSend(searchCondition model.SearchCondition) bool {
 			"buzhi":    fmt.Sprint(goods.Buzhi),
 			"merchant": goods.Merchant,
 		}
-		SendWxPush(searchCondition.WxTemplateId, searchCondition.WxTagId, goods.Url, data)
+		SendWxPush(ctx, searchCondition.WxTemplateId, searchCondition.WxTagId, goods.Url, data)
 	}
 	return true
 }
 
-func isSentGoods(searchCondition model.SearchCondition, newGoods model.Goods) bool {
+func isSentGoods(ctx context.Context, searchCondition model.SearchCondition, newGoods model.Goods) bool {
 	today := time.Now()
 	var expiredKeys []string
 	for key, goods := range sentGoodsMap {
@@ -80,74 +84,74 @@ func isSentGoods(searchCondition model.SearchCondition, newGoods model.Goods) bo
 	return false
 }
 
-func addSentGoods(searchCondition model.SearchCondition, newGoods model.Goods) {
+func addSentGoods(ctx context.Context, searchCondition model.SearchCondition, newGoods model.Goods) {
 	newKey := fmt.Sprintf("%+v:%+v", searchCondition.WxTagId, newGoods.Url)
 	sentGoodsMap[newKey] = newGoods
 }
 
 //搜索商品
-func searchGoods(searchCondition model.SearchCondition) ([]model.Goods, error) {
-	logrus.WithFields(logrus.Fields{"searchCondition": searchCondition}).Info("搜索商品")
+func searchGoods(ctx context.Context, searchCondition model.SearchCondition) ([]model.Goods, error) {
+	logrus.WithContext(ctx).WithFields(logrus.Fields{"searchCondition": searchCondition}).Info("搜索商品")
 
 	titleContainRegular, err := regexp.Compile(searchCondition.TitleContain)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{"TitleContain": searchCondition.TitleContain, "err": err}).Error("创建标题包含正则对象失败")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"TitleContain": searchCondition.TitleContain, "err": err}).Error("创建标题包含正则对象失败")
 		return nil, err
 	}
 	if searchCondition.TitleContain == "" {
-		logrus.Info("标题包含正则为空，取消创建标题包含正则对象")
+		logrus.WithContext(ctx).Info("标题包含正则为空，取消创建标题包含正则对象")
 		titleContainRegular = nil
 	}
 
 	titleExcludeRegular, err := regexp.Compile(searchCondition.TitleExclude)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{"TitleExclude": searchCondition.TitleExclude, "err": err}).Error("创建标题排除正则对象失败")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"TitleExclude": searchCondition.TitleExclude, "err": err}).Error("创建标题排除正则对象失败")
 		return nil, err
 	}
 	if searchCondition.TitleExclude == "" {
-		logrus.Info("标题排除正则为空，取消创建标题排除正则对象")
+		logrus.WithContext(ctx).Info("标题排除正则为空，取消创建标题排除正则对象")
 		titleExcludeRegular = nil
 	}
 
 	merchantContainRegular, err := regexp.Compile(searchCondition.MerchantContain)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{"MerchantContain": searchCondition.MerchantContain, "err": err}).Error("创建商家包含正则对象失败")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"MerchantContain": searchCondition.MerchantContain, "err": err}).Error("创建商家包含正则对象失败")
 		return nil, err
 	}
 	if searchCondition.MerchantContain == "" {
-		logrus.Info("商家包含正则为空，取消创建商家包含正则对象")
+		logrus.WithContext(ctx).Info("商家包含正则为空，取消创建商家包含正则对象")
 		merchantContainRegular = nil
 	}
 
 	merchantExcludeRegular, err := regexp.Compile(searchCondition.MerchantExclude)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{"MerchantExclude": searchCondition.MerchantExclude, "err": err}).Error("创建商家排除正则对象失败")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"MerchantExclude": searchCondition.MerchantExclude, "err": err}).Error("创建商家排除正则对象失败")
 		return nil, err
 	}
 	if searchCondition.MerchantExclude == "" {
-		logrus.Info("商家排除正则为空，取消创建商家排除正则对象")
+		logrus.WithContext(ctx).Info("商家排除正则为空，取消创建商家排除正则对象")
 		merchantExcludeRegular = nil
 	}
 
 	var goodses []model.Goods
 	for page := 1; page <= config.MaxPage; page = page + 1 {
-		html, err := requestListGoods(searchCondition.SearchKey, page)
+		html, err := requestListGoods(ctx, searchCondition.SearchKey, page)
 		if err != nil {
-			logrus.WithFields(logrus.Fields{"err": err}).Error("请求商品列表页面失败")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("请求商品列表页面失败")
 			continue
 		}
-		gs, err := analysisListGoods(html)
+		gs, err := analysisListGoods(ctx, html)
 		if err != nil {
-			logrus.WithFields(logrus.Fields{"err": err}).Error("分析商品列表页面")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("分析商品列表页面")
 			continue
 		}
 		if len(gs) == 0 {
-			logrus.WithFields(logrus.Fields{"page": page}).Info("遍历完成全部商品列表页面")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"page": page}).Info("遍历完成全部商品列表页面")
 			break
 		}
 
 		for _, goods := range gs {
-			if isMeetCondition(goods, searchCondition, titleContainRegular, titleExcludeRegular, merchantContainRegular, merchantExcludeRegular) {
+			if isMeetCondition(ctx, goods, searchCondition, titleContainRegular, titleExcludeRegular, merchantContainRegular, merchantExcludeRegular) {
 				goodses = append(goodses, goods)
 			}
 		}
@@ -157,57 +161,57 @@ func searchGoods(searchCondition model.SearchCondition) ([]model.Goods, error) {
 	return goodses, nil
 }
 
-func isMeetCondition(goods model.Goods, searchCondition model.SearchCondition,
+func isMeetCondition(ctx context.Context, goods model.Goods, searchCondition model.SearchCondition,
 	titleContainRegular *regexp.Regexp, titleExcludeRegular *regexp.Regexp,
 	merchantContainRegular *regexp.Regexp, merchantExcludeRegular *regexp.Regexp) bool {
 	if goods.Price < searchCondition.MinPrice || goods.Price > searchCondition.MaxPrice {
-		logrus.WithFields(logrus.Fields{"MinPrice": searchCondition.MinPrice, "Price": goods.Price, "MaxPrice": searchCondition.MaxPrice, "url": goods.Url}).Info("商品【价格】不在范围内")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"MinPrice": searchCondition.MinPrice, "Price": goods.Price, "MaxPrice": searchCondition.MaxPrice, "url": goods.Url}).Info("商品【价格】不在范围内")
 		return false
 	}
 	if goods.Zhi < searchCondition.MinZhi {
-		logrus.WithFields(logrus.Fields{"Zhi": goods.Zhi, "MinZhi": searchCondition.MinZhi, "url": goods.Url}).Info("商品【值】不在范围内")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"Zhi": goods.Zhi, "MinZhi": searchCondition.MinZhi, "url": goods.Url}).Info("商品【值】不在范围内")
 		return false
 	}
 	if goods.Buzhi > searchCondition.MaxBuzhi {
-		logrus.WithFields(logrus.Fields{"Buzhi": goods.Buzhi, "MaxBuzhi": searchCondition.MaxBuzhi, "url": goods.Url}).Info("商品【不值】不在范围内")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"Buzhi": goods.Buzhi, "MaxBuzhi": searchCondition.MaxBuzhi, "url": goods.Url}).Info("商品【不值】不在范围内")
 		return false
 	}
 	if titleContainRegular != nil && !titleContainRegular.MatchString(goods.Title) {
-		logrus.WithFields(logrus.Fields{"Title": goods.Title, "TitleContain": searchCondition.TitleContain, "url": goods.Url}).Info("【标题】被包含正则过滤")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"Title": goods.Title, "TitleContain": searchCondition.TitleContain, "url": goods.Url}).Info("【标题】被包含正则过滤")
 		return false
 	}
 	if titleExcludeRegular != nil && titleExcludeRegular.MatchString(goods.Title) {
-		logrus.WithFields(logrus.Fields{"Title": goods.Title, "TitleExclude": searchCondition.TitleExclude, "url": goods.Url}).Info("【标题】被排除正则过滤")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"Title": goods.Title, "TitleExclude": searchCondition.TitleExclude, "url": goods.Url}).Info("【标题】被排除正则过滤")
 		return false
 	}
 	if merchantContainRegular != nil && !merchantContainRegular.MatchString(goods.Merchant) {
-		logrus.WithFields(logrus.Fields{"Merchant": goods.Merchant, "MerchantContain": searchCondition.MerchantContain, "url": goods.Url}).Info("【商家】被包含正则过滤")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"Merchant": goods.Merchant, "MerchantContain": searchCondition.MerchantContain, "url": goods.Url}).Info("【商家】被包含正则过滤")
 		return false
 	}
 	if merchantExcludeRegular != nil && merchantExcludeRegular.MatchString(goods.Merchant) {
-		logrus.WithFields(logrus.Fields{"Merchant": goods.Merchant, "MerchantExclude": searchCondition.MerchantExclude, "url": goods.Url}).Info("【商家】被排除正则过滤")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"Merchant": goods.Merchant, "MerchantExclude": searchCondition.MerchantExclude, "url": goods.Url}).Info("【商家】被排除正则过滤")
 		return false
 	}
 	return true
 }
 
 //分析商品列表页面
-func analysisListGoods(html string) ([]model.Goods, error) {
+func analysisListGoods(ctx context.Context, html string) ([]model.Goods, error) {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
 	if err != nil {
-		logrus.WithFields(logrus.Fields{"err": err}).Error("商品列表页面，html解析失败")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("商品列表页面，html解析失败")
 		return nil, err
 	}
 
 	numRegexp, err := regexp.Compile("\\d+(\\.\\d+)*")
 	if err != nil {
-		logrus.WithFields(logrus.Fields{"err": err}).Error("创建数字正则对象失败")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("创建数字正则对象失败")
 		return nil, err
 	}
 
 	dateRegexp, err := regexp.Compile("\\d\\d:\\d\\d")
 	if err != nil {
-		logrus.WithFields(logrus.Fields{"err": err}).Error("创建日期正则对象失败")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("创建日期正则对象失败")
 		return nil, err
 	}
 
@@ -368,7 +372,7 @@ func analysisListGoods(html string) ([]model.Goods, error) {
 }
 
 //请求商品列表页面
-func requestListGoods(searchKey string, page int) (string, error) {
+func requestListGoods(ctx context.Context, searchKey string, page int) (string, error) {
 	request := gorequest.New()
 	response, body, errs := request.Get("https://search.smzdm.com").
 		Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36").
