@@ -61,10 +61,14 @@ echo 'wxToken:'$wxToken
 echo 'input any key go on,or control+c over'
 read
 
+echo 'stop container'
+docker stop smzdm_reptile
+echo 'remove container'
+docker rm smzdm_reptile
+echo 'remove image'
+docker rmi smzdm_reptile
 echo 'docker build'
 docker build -t smzdm_reptile .
-echo 'docker create volume'
-docker volume create smzdm_reptile
 echo 'docker run'
 docker run -d \
 --restart=always \
