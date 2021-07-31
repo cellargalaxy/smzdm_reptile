@@ -365,7 +365,7 @@ func analysisListGoods(ctx context.Context, html string) ([]model.Goods, error) 
 			Merchant: merchant,
 			Date:     date,
 		}
-		logrus.WithFields(logrus.Fields{"goods": goods}).Info("创建商品对象")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"goods": goods}).Info("创建商品对象")
 		goodses = append(goodses, goods)
 	})
 	return goodses, nil
@@ -382,14 +382,14 @@ func requestListGoods(ctx context.Context, searchKey string, page int) (string, 
 		Param("p", fmt.Sprintf("%d", page)).
 		Timeout(config.Timeout).
 		End()
-	logrus.WithFields(logrus.Fields{"errs": errs}).Info("获取商品列表页面请求")
+	logrus.WithContext(ctx).WithFields(logrus.Fields{"errs": errs}).Info("获取商品列表页面请求")
 	if errs != nil && len(errs) > 0 {
-		logrus.Error("获取商品列表页面请求异常")
+		logrus.WithContext(ctx).Error("获取商品列表页面请求异常")
 		return "", fmt.Errorf("获取商品列表页面请求异常")
 	}
-	logrus.WithFields(logrus.Fields{"StatusCode": response.StatusCode, "body": len(body)}).Info("获取商品列表页面请求")
+	logrus.WithContext(ctx).WithFields(logrus.Fields{"StatusCode": response.StatusCode, "body": len(body)}).Info("获取商品列表页面请求")
 	if response.StatusCode != 200 {
-		logrus.Error("获取商品列表页面请求响应码异常")
+		logrus.WithContext(ctx).Error("获取商品列表页面请求响应码异常")
 		return "", fmt.Errorf("获取商品列表页面请求响应码异常")
 	}
 	return body, nil
