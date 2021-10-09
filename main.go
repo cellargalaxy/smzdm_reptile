@@ -1,16 +1,17 @@
 package main
 
 import (
-	"context"
 	"github.com/cellargalaxy/go_common/util"
-	"github.com/cellargalaxy/smzdm-reptile/controller"
-	"github.com/cellargalaxy/smzdm-reptile/service"
+	"github.com/cellargalaxy/smzdm_reptile/config"
+	"github.com/cellargalaxy/smzdm_reptile/service"
+	"github.com/sirupsen/logrus"
 )
 
+func init() {
+	logrus.SetLevel(config.Config.LogLevel)
+	util.InitLog(util.GetServerNameWithPanic())
+}
+
 func main() {
-	util.InitLog("smzdm.log")
-	ctx := context.Background()
-	ctx = util.SetLogId(ctx)
-	go service.StartSearchService(ctx)
-	controller.StartWebService()
+	service.StartSearchService()
 }

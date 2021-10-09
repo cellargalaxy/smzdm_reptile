@@ -1,86 +1,51 @@
 #!/usr/bin/env bash
 
-if [ -z $retry ];then
-    read -p "please enter retry(default:2):" retry
+if [ -z $server_name ]; then
+  read -p "please enter server_name(default:smzdm_reptile):" smzdm_reptile
 fi
-if [ -z $retry ];then
-    retry="2"
-fi
-
-if [ -z $maxPage ];then
-    read -p "please enter max page(default:10):" maxPage
-fi
-if [ -z $maxPage ];then
-    maxPage="10"
+if [ -z $server_name ]; then
+  server_name="smzdm_reptile"
 fi
 
-if [ -z $timeout ];then
-    read -p "please enter timeout(default:5[s]):" timeout
-fi
-if [ -z $timeout ];then
-    timeout="5"
-fi
-
-if [ -z $sleep ];then
-    read -p "please enter sleep(default:2[s]):" sleep
-fi
-if [ -z $sleep ];then
-    sleep="2"
-fi
-
-if [ -z $listenPort ];then
-    read -p "please enter listen port(default:8088):" listenPort
-fi
-if [ -z $listenPort ];then
-    listenPort="8088"
-fi
-
-while :
-do
-    if [ ! -z $wxPushAddress ];then
-        break
-    fi
-    read -p "please enter wx push address(required):" wxPushAddress
+while :; do
+  if [ ! -z $server_center_address ]; then
+    break
+  fi
+  read -p "please enter server_center_address(required):" server_center_address
 done
 
-while :
-do
-    if [ ! -z $wxToken ];then
-        break
-    fi
-    read -p "please enter wx token(required):" wxToken
+while :; do
+  if [ ! -z $server_center_secret ]; then
+    break
+  fi
+  read -p "please enter server_center_secret(required):" server_center_secret
 done
 
-echo 'retry:'$retry
-echo 'maxPage:'$maxPage
-echo 'timeout:'$timeout
-echo 'sleep:'$sleep
-echo 'listenPort:'$listenPort
-echo 'wxPushAddress:'$wxPushAddress
-echo 'wxToken:'$wxToken
-echo 'input any key go on,or control+c over'
+echo
+echo "server_name: $server_name"
+echo "server_center_address: $server_center_address"
+echo "server_center_secret: $server_center_secret"
+echo 'input any key go on, or control+c over'
 read
 
+echo 'create volume'
+docker volume create log
 echo 'stop container'
-docker stop smzdm_reptile
+docker stop $server_name
 echo 'remove container'
-docker rm smzdm_reptile
+docker rm $server_name
 echo 'remove image'
-docker rmi smzdm_reptile
+docker rmi $server_name
 echo 'docker build'
-docker build -t smzdm_reptile .
+docker build -t $server_name .
 echo 'docker run'
 docker run -d \
---restart=always \
---name smzdm_reptile \
--p $listenPort:8088 \
--e RETRY=$retry \
--e MAX_PAGE=$maxPage \
--e TIMEOUT=$timeout \
--e SLEEP=$sleep \
--e WX_PUSH_ADDRESS=$wxPushAddress \
--e WX_TOKEN=$wxToken \
--v smzdm_reptile:/resources \
-smzdm_reptile
+  --restart=always \
+  --name $server_name \
+  -v log:/log \
+  -e server_name=$server_name \
+  -e server_center_address=$server_center_address \
+  -e server_center_secret=$server_center_secret \
+  $server_name
 
 echo 'all finish'

@@ -1,106 +1,70 @@
 package config
 
 import (
-	"github.com/go-ini/ini"
+	"context"
+	"github.com/cellargalaxy/go_common/util"
+	sc_model "github.com/cellargalaxy/server_center/model"
+	"github.com/cellargalaxy/server_center/sdk"
+	"github.com/cellargalaxy/smzdm_reptile/model"
 	"github.com/sirupsen/logrus"
-	"os"
-	"strconv"
 	"time"
 )
 
-const (
-	SuccessCode = 1
-	FailCode    = 2
-
-	ConfigFilePath          = "resources/config.ini"
-	SearchConditionFilePath = "resources/searchCondition.json"
-
-	defaultRetry         = 2
-	defaultMaxPage       = 10
-	defaultTimeoutSecond = 5
-	defaultTimeout       = defaultTimeoutSecond * time.Second
-	defaultSleepSecond   = 2
-	defaultSleep         = defaultSleepSecond * time.Second
-	defaultListenAddress = ":8088"
-	defaultWxPushAddress = ""
-	defaultWxToken       = ""
-)
-
-var Retry = defaultRetry
-var MaxPage = defaultMaxPage
-var Timeout = defaultTimeout
-var Sleep = defaultSleep
-var ListenAddress = defaultListenAddress
-var WxPushAddress = defaultWxPushAddress
-var WxToken = defaultWxToken
+var Config = model.Config{}
 
 func init() {
-	logrus.Info("加载配置开始")
-
-	configFile, err := ini.Load(ConfigFilePath)
-	if err == nil {
-		Retry = configFile.Section("").Key("retry").MustInt(defaultRetry)
-		MaxPage = configFile.Section("").Key("maxPage").MustInt(defaultMaxPage)
-		Timeout = time.Duration(configFile.Section("").Key("timeout").MustInt(defaultTimeoutSecond)) * time.Second
-		Sleep = time.Duration(configFile.Section("").Key("sleep").MustInt(defaultSleepSecond)) * time.Second
-		ListenAddress = configFile.Section("").Key("listenAddress").MustString(defaultListenAddress)
-		WxPushAddress = configFile.Section("").Key("wxPushAddress").MustString(defaultWxPushAddress)
-		WxToken = configFile.Section("").Key("wxToken").MustString(defaultWxToken)
-	} else {
-		logrus.WithFields(logrus.Fields{"err": err}).Error("加载配置文件失败")
+	ctx := util.CreateLogCtx()
+	client, err := sdk.NewDefaultServerCenterClient(ctx, &ServerCenterHandler{})
+	if err != nil {
+		panic(err)
 	}
-
-	retryString := os.Getenv("RETRY")
-	logrus.WithFields(logrus.Fields{"retryString": retryString}).Info("环境变量读取配置Retry")
-	retry, err := strconv.Atoi(retryString)
-	if err == nil {
-		Retry = retry
+	_, err = client.StartConfWithInitConf(ctx)
+	if err != nil {
+		panic(err)
 	}
+}
 
-	maxPageString := os.Getenv("MAX_PAGE")
-	logrus.WithFields(logrus.Fields{"maxPageString": maxPageString}).Info("环境变量读取配置MaxPage")
-	maxPage, err := strconv.Atoi(maxPageString)
-	if err == nil && maxPage > 0 {
-		MaxPage = maxPage
+func checkAndResetConfig(ctx context.Context, config model.Config) (model.Config, error) {
+	if config.LogLevel <= 0 || config.LogLevel > logrus.TraceLevel {
+		config.LogLevel = logrus.InfoLevel
 	}
-
-	timeoutString := os.Getenv("TIMEOUT")
-	logrus.WithFields(logrus.Fields{"timeoutString": timeoutString}).Info("环境变量读取配置Timeout")
-	timeout, err := strconv.Atoi(timeoutString)
-	if err == nil && timeout > 0 {
-		Timeout = time.Duration(timeout) * time.Second
+	if config.Timeout < 0 {
+		config.Timeout = 3 * time.Second
 	}
-
-	sleepString := os.Getenv("SLEEP")
-	logrus.WithFields(logrus.Fields{"sleepString": sleepString}).Info("环境变量读取配置Sleep")
-	sleep, err := strconv.Atoi(sleepString)
-	if err == nil && sleep > 0 {
-		Sleep = time.Duration(sleep) * time.Second
+	if config.Sleep < 0 {
+		config.Sleep = 3 * time.Second
 	}
+	return config, nil
+}
 
-	listenAddress := os.Getenv("LISTEN_ADDRESS")
-	logrus.WithFields(logrus.Fields{"listenAddress": listenAddress}).Info("环境变量读取配置ListenAddress")
-	if listenAddress != "" {
-		ListenAddress = listenAddress
+type ServerCenterHandler struct {
+}
+
+func (this *ServerCenterHandler) GetServerName(ctx context.Context) string {
+	return sdk.GetEnvServerName(ctx)
+}
+func (this *ServerCenterHandler) GetAddress(ctx context.Context) string {
+	return sdk.GetEnvServerCenterAddress(ctx)
+}
+func (this *ServerCenterHandler) GetSecret(ctx context.Context) string {
+	return sdk.GetEnvServerCenterSecret(ctx)
+}
+func (this *ServerCenterHandler) GetInterval(ctx context.Context) time.Duration {
+	return 5 * time.Minute
+}
+func (this *ServerCenterHandler) ParseConf(ctx context.Context, object sc_model.ServerConfModel) error {
+	var config model.Config
+	err := util.UnmarshalYamlString(object.ConfText, &config)
+	if err != nil {
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("反序列化配置异常")
+		return err
 	}
-
-	wxPushAddress := os.Getenv("WX_PUSH_ADDRESS")
-	logrus.WithFields(logrus.Fields{"wxPushAddress": wxPushAddress}).Info("环境变量读取配置WxPushAddress")
-	if wxPushAddress != "" {
-		WxPushAddress = wxPushAddress
+	config, err = checkAndResetConfig(ctx, config)
+	if err != nil {
+		return err
 	}
-
-	wxToken := os.Getenv("WX_TOKEN")
-	logrus.WithFields(logrus.Fields{"wxToken": wxToken}).Info("环境变量读取配置WxToken")
-	if wxPushAddress != "" {
-		WxToken = wxToken
-	}
-
-	logrus.WithFields(logrus.Fields{"Retry": Retry}).Info("配置Retry")
-	logrus.WithFields(logrus.Fields{"MaxPage": MaxPage}).Info("配置MaxPage")
-	logrus.WithFields(logrus.Fields{"Timeout": Timeout}).Info("配置Timeout")
-	logrus.WithFields(logrus.Fields{"Sleep": Sleep}).Info("配置Sleep")
-	logrus.WithFields(logrus.Fields{"ListenAddress": ListenAddress}).Info("配置ListenAddress")
-	logrus.WithFields(logrus.Fields{"WxPushAddress": WxPushAddress}).Info("配置WxPushAddress")
-	logrus.WithFields(logrus.Fields{"WxToken": WxToken}).Info("配置WxToken")
+	Config = config
+	logrus.SetLevel(Config.LogLevel)
+	logrus.WithContext(ctx).WithFields(logrus.Fields{"Config": Config}).Info("加载配置")
+	return nil
 }

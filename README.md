@@ -1,4 +1,4 @@
-# smzdm-reptile
+# smzdm_reptile
 什么值得买(张大妈)爬虫
 
 ## 2020-07-11

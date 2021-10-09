@@ -2,27 +2,12 @@ package model
 
 import "time"
 
-type SearchCondition struct {
-	SearchId        string  `json:"searchId"`
-	SearchKey       string  `json:"searchKey"`
-	TitleContain    string  `json:"titleContain"`
-	TitleExclude    string  `json:"titleExclude"`
-	MinPrice        float32 `json:"minPrice"`
-	MaxPrice        float32 `json:"maxPrice"`
-	MinZhi          int     `json:"minZhi"`
-	MaxBuzhi        int     `json:"maxBuzhi"`
-	MerchantContain string  `json:"merchantContain"`
-	MerchantExclude string  `json:"merchantExclude"`
-	WxTemplateId    string  `json:"wxTemplateId"`
-	WxTagId         int     `json:"wxTagId"`
-}
-
 type Goods struct {
-	Title    string
-	Price    float32
-	Zhi      int
-	Buzhi    int
-	Merchant string
-	Url      string
-	Date     time.Time
+	Title    string    `json:"title"`
+	Price    float64   `json:"price"`
+	Zhi      int       `json:"zhi"`
+	Buzhi    int       `json:"buzhi"`
+	Merchant string    `json:"merchant"`
+	Url      string    `json:"url"`
+	Date     time.Time `json:"date"`
 }
