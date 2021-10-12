@@ -11,6 +11,7 @@ import (
 var client *sdk.MsgClient
 
 func init() {
+	sdk.InitConfig(nil)
 	var err error
 	client, err = sdk.NewDefaultMsgClient()
 	if err != nil {

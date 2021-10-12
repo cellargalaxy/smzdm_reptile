@@ -51,28 +51,28 @@ func analysisListGoods(ctx context.Context, html string) ([]model.Goods, error) 
 		//title,url
 		titleSelection := goodsSelection.Find(".feed-nowrap")
 		if titleSelection == nil {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，title为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Warn("商品列表页面，title为空")
 			return
 		}
 		titleSelection = titleSelection.First()
 		if titleSelection == nil {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，title为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Warn("商品列表页面，title为空")
 			return
 		}
 		title := strings.TrimSpace(titleSelection.Text())
 		if title == "" {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，title为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Warn("商品列表页面，title为空")
 			return
 		}
 		goods.Title = title
 		url, exists := titleSelection.Attr("href")
 		if !exists {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，url为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Warn("商品列表页面，url为空")
 			return
 		}
 		url = strings.TrimSpace(url)
 		if url == "" {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，url为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Warn("商品列表页面，url为空")
 			return
 		}
 		goods.Url = url
@@ -80,17 +80,17 @@ func analysisListGoods(ctx context.Context, html string) ([]model.Goods, error) 
 		//price
 		priceSelection := goodsSelection.Find(".z-highlight")
 		if priceSelection == nil {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，price为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，price为空")
 			return
 		}
 		priceSelection = priceSelection.First()
 		if priceSelection == nil {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，price为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，price为空")
 			return
 		}
 		priceString := strings.TrimSpace(priceSelection.Text())
 		if !numRegexp.MatchString(priceString) {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，price为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，price为空")
 			return
 		}
 		priceString = numRegexp.FindString(priceString)
@@ -104,37 +104,37 @@ func analysisListGoods(ctx context.Context, html string) ([]model.Goods, error) 
 		//zhi
 		zhiSelection := goodsSelection.Find(".price-btn-up")
 		if zhiSelection == nil {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，zhi为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，zhi为空")
 			return
 		}
 		zhiSelection = zhiSelection.First()
 		if zhiSelection == nil {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，zhi为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，zhi为空")
 			return
 		}
 		zhiSelection = zhiSelection.Find(".unvoted-wrap")
 		if zhiSelection == nil {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，zhi为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，zhi为空")
 			return
 		}
 		zhiSelection = zhiSelection.First()
 		if zhiSelection == nil {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，zhi为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，zhi为空")
 			return
 		}
 		zhiSelection = zhiSelection.Find("span")
 		if zhiSelection == nil {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，zhi为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，zhi为空")
 			return
 		}
 		zhiSelection = zhiSelection.First()
 		if zhiSelection == nil {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，zhi为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，zhi为空")
 			return
 		}
 		zhiString := strings.TrimSpace(zhiSelection.Text())
 		if !numRegexp.MatchString(zhiString) {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，zhi为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，zhi为空")
 			return
 		}
 		zhiString = numRegexp.FindString(zhiString)
@@ -148,37 +148,37 @@ func analysisListGoods(ctx context.Context, html string) ([]model.Goods, error) 
 		//buzhi
 		buzhiSelection := goodsSelection.Find(".price-btn-down")
 		if buzhiSelection == nil {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，buzhi为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，buzhi为空")
 			return
 		}
 		buzhiSelection = buzhiSelection.First()
 		if buzhiSelection == nil {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，buzhi为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，buzhi为空")
 			return
 		}
 		buzhiSelection = buzhiSelection.Find(".unvoted-wrap")
 		if buzhiSelection == nil {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，buzhi为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，buzhi为空")
 			return
 		}
 		buzhiSelection = buzhiSelection.First()
 		if buzhiSelection == nil {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，buzhi为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，buzhi为空")
 			return
 		}
 		buzhiSelection = buzhiSelection.Find("span")
 		if buzhiSelection == nil {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，buzhi为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，buzhi为空")
 			return
 		}
 		buzhiSelection = buzhiSelection.First()
 		if buzhiSelection == nil {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，buzhi为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，buzhi为空")
 			return
 		}
 		buzhiString := strings.TrimSpace(buzhiSelection.Text())
 		if !numRegexp.MatchString(buzhiString) {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，buzhi为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，buzhi为空")
 			return
 		}
 		buzhiString = numRegexp.FindString(buzhiString)
@@ -192,24 +192,24 @@ func analysisListGoods(ctx context.Context, html string) ([]model.Goods, error) 
 		//date,merchant
 		merchantSelection := goodsSelection.Find(".feed-block-extras")
 		if merchantSelection == nil {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，merchant为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，merchant为空")
 			return
 		}
 		merchantSelection = merchantSelection.First()
 		if merchantSelection == nil {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，merchant为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，merchant为空")
 			return
 		}
 		merchantString := strings.TrimSpace(merchantSelection.Text())
 		ss := strings.Split(merchantString, " ")
 		if len(ss) < 2 {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，merchant非法")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，merchant非法")
 			return
 		}
 		dateString := strings.Join(ss[:len(ss)-1], " ")
 		dateString = strings.TrimSpace(dateString)
 		if !dateRegexp.MatchString(dateString) {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，date非法")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，date非法")
 			return
 		}
 		date, err := time.Parse("2006-01-02 15:04", todayString+dateString)
@@ -220,7 +220,7 @@ func analysisListGoods(ctx context.Context, html string) ([]model.Goods, error) 
 		goods.Date = date
 		merchant := strings.TrimSpace(ss[len(ss)-1])
 		if merchant == "" {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{}).Debug("商品列表页面，merchant为空")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，merchant为空")
 			return
 		}
 		goods.Merchant = merchant
