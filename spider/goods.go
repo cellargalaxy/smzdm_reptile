@@ -214,7 +214,7 @@ func analysisListGoods(ctx context.Context, html string) ([]model.Goods, error) 
 		}
 		date, err := time.Parse("2006-01-02 15:04", todayString+dateString)
 		if err != nil {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Warn("商品列表页面，merchant非法")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Debug("商品列表页面，merchant非法")
 			return
 		}
 		goods.Date = date
