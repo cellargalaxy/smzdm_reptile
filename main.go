@@ -9,7 +9,7 @@ import (
 
 func init() {
 	logrus.SetLevel(config.Config.LogLevel)
-	util.InitLog(util.GetServerNameWithPanic())
+	util.InitDefaultLog(util.GetServerNameWithPanic())
 }
 
 /**
