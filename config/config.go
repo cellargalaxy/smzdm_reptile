@@ -68,3 +68,8 @@ func (this *ServerCenterHandler) ParseConf(ctx context.Context, object sc_model.
 	logrus.WithContext(ctx).WithFields(logrus.Fields{"Config": Config}).Info("加载配置")
 	return nil
 }
+func (this *ServerCenterHandler) GetDefaultConf(ctx context.Context) string {
+	var config model.Config
+	config, _ = checkAndResetConfig(ctx, config)
+	return util.ToYamlString(config)
+}
