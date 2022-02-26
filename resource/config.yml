@@ -1,6 +1,0 @@
-log_level: info
-retry: 0
-timeout: 0s
-sleep: 0s
-max_page: 0
-conditions: []

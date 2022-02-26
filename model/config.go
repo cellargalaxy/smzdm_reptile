@@ -2,12 +2,14 @@ package model
 
 import (
 	"github.com/cellargalaxy/go_common/util"
-	"github.com/sirupsen/logrus"
 	"time"
 )
 
+const (
+	DefaultServerName = "smzdm_reptile"
+)
+
 type Config struct {
-	LogLevel   logrus.Level      `json:"log_level" yaml:"log_level"`
 	Retry      int               `json:"retry" yaml:"retry"`
 	Timeout    time.Duration     `json:"timeout" yaml:"timeout"`
 	Sleep      time.Duration     `json:"sleep" yaml:"sleep"`

@@ -3,14 +3,12 @@ package test
 import (
 	"github.com/cellargalaxy/go_common/util"
 	"github.com/cellargalaxy/smzdm_reptile/model"
-	"github.com/sirupsen/logrus"
 	"testing"
 	"time"
 )
 
 func TestConfig(test *testing.T) {
 	var config model.Config
-	config.LogLevel = logrus.InfoLevel
 	config.Retry = 3
 	config.Timeout = time.Second * 3
 	config.Sleep = time.Second * 3
