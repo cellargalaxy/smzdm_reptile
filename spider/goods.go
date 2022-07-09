@@ -42,6 +42,7 @@ func analysisListGoods(ctx context.Context, html string) ([]model.Goods, error) 
 		return nil, err
 	}
 
+	toyearString := time.Now().Format("2006-")
 	todayString := time.Now().Format("2006-01-02 ")
 
 	var goodses []model.Goods
@@ -212,9 +213,16 @@ func analysisListGoods(ctx context.Context, html string) ([]model.Goods, error) 
 			logrus.WithContext(ctx).WithFields(logrus.Fields{"url": url}).Warn("商品列表页面，date非法")
 			return
 		}
-		date, err := time.Parse("2006-01-02 15:04", todayString+dateString)
+		date, err := time.Parse("2006-01-02 15:04", toyearString+dateString)
 		if err != nil {
-			logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Debug("商品列表页面，merchant非法")
+			date, err = time.Parse("2006-01-02 15:04", todayString+dateString)
+		}
+		if err != nil {
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Debug("商品列表页面，date非法")
+			return
+		}
+		if time.Hour*24 < time.Now().Sub(date) {
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Debug("商品列表页面，商品过期")
 			return
 		}
 		goods.Date = date
