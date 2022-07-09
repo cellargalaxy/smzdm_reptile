@@ -16,7 +16,7 @@ import (
 
 func StartSearchService() {
 	for {
-		ctx := util.CreateLogCtx()
+		ctx := util.GenCtx()
 		for _, searchCondition := range config.Config.Conditions {
 			err := searchAndSend(ctx, searchCondition)
 			if err != nil {

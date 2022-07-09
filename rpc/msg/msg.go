@@ -8,17 +8,6 @@ import (
 	"time"
 )
 
-var client *sdk.MsgClient
-
-func init() {
-	sdk.InitConfig(nil)
-	var err error
-	client, err = sdk.NewDefaultMsgClient()
-	if err != nil {
-		panic(err)
-	}
-}
-
 func SendErr(ctx context.Context, name string, err error) {
 	if cache.RateLimit("SendErr-"+name, time.Hour) {
 		return
@@ -32,12 +21,12 @@ func Send(ctx context.Context, text string) {
 }
 
 func SendTg(ctx context.Context, text string) (bool, error) {
-	return client.SendTgMsg2ConfigChatId(ctx, text)
+	return sdk.Client.SendTgMsg2ConfigChatId(ctx, text)
 }
 func SendWx(ctx context.Context, text string) (bool, error) {
-	return client.SendTemplateToCommonTag(ctx, text)
+	return sdk.Client.SendTemplateToCommonTag(ctx, text)
 }
 
 func SendWxTemplateToTag(ctx context.Context, templateId string, tagId int, url string, data map[string]interface{}) (bool, error) {
-	return client.SendWxTemplateToTag(ctx, templateId, tagId, url, data)
+	return sdk.Client.SendWxTemplateToTag(ctx, templateId, tagId, url, data)
 }

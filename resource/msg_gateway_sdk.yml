@@ -1,5 +1,0 @@
-retry: 3
-timeout: "3s"
-sleep: "3s"
-address: "https://address.com/msg_gateway"
-secret: "secret"
