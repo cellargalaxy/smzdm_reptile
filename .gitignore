@@ -27,3 +27,4 @@ build/
 *.log
 smzdm_reptile
 smzdm_reptile.exe
+*.yml
