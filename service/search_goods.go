@@ -11,7 +11,6 @@ import (
 	"github.com/cellargalaxy/smzdm_reptile/spider"
 	"github.com/sirupsen/logrus"
 	"regexp"
-	"time"
 )
 
 func StartSearchService() {
@@ -23,9 +22,9 @@ func StartSearchService() {
 				logrus.WithContext(ctx).WithFields(logrus.Fields{"searchCondition": searchCondition, "err": err}).Error("搜索并发送商品失败")
 				msg.SendErr(ctx, "搜索并发送商品", err)
 			}
-			time.Sleep(util.WareDuration(config.Config.Sleep))
+			util.SleepWare(ctx, config.Config.Sleep)
 		}
-		time.Sleep(util.WareDuration(config.Config.Sleep))
+		util.Sleep(ctx, config.Config.Sleep)
 	}
 }
 

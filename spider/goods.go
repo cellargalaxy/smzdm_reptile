@@ -17,7 +17,7 @@ import (
 func ListGoods(ctx context.Context, searchKey string) ([]model.Goods, error) {
 	var goodses []model.Goods
 	for page := 1; page <= config.Config.MaxPage; page = page + 1 {
-		time.Sleep(util.WareDuration(config.Config.Sleep))
+		util.SleepWare(ctx, config.Config.Sleep)
 		html, err := requestListGoods(ctx, searchKey, page)
 		if err != nil {
 			continue
