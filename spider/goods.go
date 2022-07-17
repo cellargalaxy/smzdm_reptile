@@ -242,7 +242,6 @@ func analysisListGoods(ctx context.Context, html string) ([]model.Goods, error) 
 //商品列表页面
 func requestListGoods(ctx context.Context, searchKey string, page int) (string, error) {
 	response, err := httpClient.R().SetContext(ctx).
-		SetHeader("User-Agent", userAgent).
 		SetQueryParam("c", "home").
 		SetQueryParam("s", searchKey).
 		SetQueryParam("v", "b").
