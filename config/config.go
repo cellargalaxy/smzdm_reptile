@@ -24,7 +24,7 @@ func init() {
 	if client == nil {
 		panic("创建ServerCenterClient为空")
 	}
-	client.StartConfWithInitConf(ctx)
+	client.StartWithInitConf(ctx)
 	logrus.WithContext(ctx).WithFields(logrus.Fields{"Config": Config}).Info("加载配置")
 }
 
