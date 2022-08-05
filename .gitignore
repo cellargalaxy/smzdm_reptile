@@ -28,3 +28,4 @@ build/
 smzdm_reptile
 smzdm_reptile.exe
 *.yml
+rsync.sh
