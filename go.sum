@@ -8,10 +8,11 @@ github.com/antonfisher/nested-logrus-formatter v1.3.1 h1:NFJIr+pzwv5QLHTPyKz9UME
 github.com/antonfisher/nested-logrus-formatter v1.3.1/go.mod h1:6WTfyWFkBc9+zyBaKIqRrg/KwMqBbodBjgbHjDz7zjA=
 github.com/cellargalaxy/go_common v0.0.0-20220805133712-43d410f5fd76 h1:sgn+lPhT+xjMwaZHfiGQFRYXTU1rXR5vDhaj453tVBQ=
 github.com/cellargalaxy/go_common v0.0.0-20220805133712-43d410f5fd76/go.mod h1:TxxW3rNYN82mCsoBwnnIAEMjr5qKHgu7w+MH1jTUxuQ=
-github.com/cellargalaxy/msg_gateway v0.0.0-20220805135800-a421b0b41a4b h1:htr1TZdO25ZQcrS/HVhxz9CHh/9zBMP2RKUC7ku1Hrg=
-github.com/cellargalaxy/msg_gateway v0.0.0-20220805135800-a421b0b41a4b/go.mod h1:r/+L/f3UdWHVIt7AGb+lHy93fTPQnqSI2IXhA67XmDQ=
-github.com/cellargalaxy/server_center v0.0.0-20220805134104-45f0a5380771 h1:Hit1Yp1gYxjWd6KcJ9/dfGNg3Y0RR6QqkuG5NpfLePM=
+github.com/cellargalaxy/msg_gateway v0.0.0-20220805140954-60209ec2df07 h1:CBvPANgsxvvYFSOHPWmUIRuOvmCqKG41jEzbjQW+4Pw=
+github.com/cellargalaxy/msg_gateway v0.0.0-20220805140954-60209ec2df07/go.mod h1:r/+L/f3UdWHVIt7AGb+lHy93fTPQnqSI2IXhA67XmDQ=
 github.com/cellargalaxy/server_center v0.0.0-20220805134104-45f0a5380771/go.mod h1:Yeo7s9ebllyvwW/pDC8oNJ2G9sSCElYhH6NUedHDKtE=
+github.com/cellargalaxy/server_center v0.0.0-20220805151024-8f142792893d h1:6WVYENi+Son72iDrPebevpZ/1hp/2QZrCIf9ach6G14=
+github.com/cellargalaxy/server_center v0.0.0-20220805151024-8f142792893d/go.mod h1:Yeo7s9ebllyvwW/pDC8oNJ2G9sSCElYhH6NUedHDKtE=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
