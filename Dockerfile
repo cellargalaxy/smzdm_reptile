@@ -1,4 +1,4 @@
-FROM golang:1.16 AS builder
+FROM golang:1.16.15-alpine3.15 AS builder
 ENV GOPROXY="https://goproxy.cn,direct"
 ENV GO111MODULE=on
 WORKDIR /
@@ -6,7 +6,7 @@ COPY . .
 RUN go mod download
 RUN CGO_ENABLED=0 GOOS=linux go build -o /smzdm_reptile
 
-FROM alpine
+FROM golang:1.16.15-alpine3.15
 COPY --from=builder /smzdm_reptile /smzdm_reptile
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
 RUN apk update
