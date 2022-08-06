@@ -13,4 +13,5 @@ RUN apk update
 RUN apk --no-cache add ca-certificates
 RUN apk add tzdata && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo "Asia/Shanghai" > /etc/timezone && apk del tzdata
 VOLUME /log
+WORKDIR /
 CMD ["/smzdm_reptile"]
