@@ -43,6 +43,7 @@ docker run -d \
   --restart=always \
   --name $server_name \
   -v log:/log \
+  -v $server_name'_resource':/resource \
   -e server_name=$server_name \
   -e server_center_address=$server_center_address \
   -e server_center_secret=$server_center_secret \
