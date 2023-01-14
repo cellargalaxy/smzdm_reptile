@@ -51,7 +51,7 @@ func searchAndSend(ctx context.Context, searchCondition model.SearchCondition) e
 	return nil
 }
 
-//搜索商品
+// 搜索商品
 func searchGoods(ctx context.Context, searchCondition model.SearchCondition) ([]model.Goods, error) {
 	logrus.WithContext(ctx).WithFields(logrus.Fields{"searchCondition": searchCondition}).Info("搜索商品")
 	goodses, err := spider.ListGoods(ctx, searchCondition.SearchKey)

@@ -13,6 +13,10 @@ import (
 var Config = model.Config{}
 
 func init() {
+	Init()
+}
+
+func Init() {
 	ctx := util.GenCtx()
 	var err error
 

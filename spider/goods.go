@@ -34,7 +34,7 @@ func ListGoods(ctx context.Context, searchKey string) ([]model.Goods, error) {
 	return goodses, nil
 }
 
-//商品列表页面
+// 商品列表页面
 func analysisListGoods(ctx context.Context, html string) ([]model.Goods, error) {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
 	if err != nil {
@@ -239,14 +239,16 @@ func analysisListGoods(ctx context.Context, html string) ([]model.Goods, error) 
 	return goodses, nil
 }
 
-//商品列表页面
+// 商品列表页面
 func requestListGoods(ctx context.Context, searchKey string, page int) (string, error) {
 	response, err := httpClient.R().SetContext(ctx).
+		SetCookies(listCookie(ctx)).
 		SetQueryParam("c", "home").
 		SetQueryParam("s", searchKey).
-		SetQueryParam("v", "b").
+		SetQueryParam("v", "a").
+		SetQueryParam("mx_v", "b").
 		SetQueryParam("p", fmt.Sprintf("%d", page)).
-		Get("https://search.smzdm.com")
+		Get("https://search.smzdm.com/")
 
 	if err != nil {
 		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("商品列表页面，请求异常")
@@ -256,6 +258,7 @@ func requestListGoods(ctx context.Context, searchKey string, page int) (string, 
 		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("商品列表页面，响应为空")
 		return "", fmt.Errorf("商品列表页面，响应为空")
 	}
+	setCookie(ctx, response.Cookies())
 	statusCode := response.StatusCode()
 	body := response.String()
 	logrus.WithContext(ctx).WithFields(logrus.Fields{"statusCode": statusCode, "len(body)": len(body)}).Info("商品列表页面，响应")
@@ -264,4 +267,36 @@ func requestListGoods(ctx context.Context, searchKey string, page int) (string, 
 		return "", fmt.Errorf("商品列表页面，响应码失败: %+v", statusCode)
 	}
 	return body, nil
+}
+
+var cookieTime time.Time
+var cookies []*http.Cookie
+
+func listCookie(ctx context.Context) []*http.Cookie {
+	if len(cookies) > 0 && time.Now().Sub(cookieTime).Minutes() < 10 {
+		return cookies
+	}
+
+	response, err := httpClient.R().SetContext(ctx).
+		SetCookies(cookies).
+		Get("https://www.smzdm.com/")
+
+	if err != nil {
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("首页，请求异常")
+		return cookies
+	}
+	if response == nil {
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("首页，响应为空")
+		return cookies
+	}
+	setCookie(ctx, response.Cookies())
+
+	return cookies
+}
+func setCookie(ctx context.Context, list []*http.Cookie) {
+	if len(list) == 0 {
+		return
+	}
+	cookies = list
+	cookieTime = time.Now()
 }
