@@ -7,7 +7,6 @@ require (
 	github.com/cellargalaxy/go_common v0.0.0-20221007081428-f87392a19701
 	github.com/cellargalaxy/msg_gateway v0.0.0-20221007083420-f9cb98b3954a
 	github.com/cellargalaxy/server_center v0.0.0-20221009111740-fb00c7af20c1
-	github.com/go-resty/resty/v2 v2.7.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/sirupsen/logrus v1.9.0
 )
@@ -20,6 +19,7 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.11.1 // indirect
+	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/gocarina/gocsv v0.0.0-20221216233619-1fea7ae8d380 // indirect
 	github.com/goccy/go-json v0.10.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
@@ -36,9 +36,9 @@ require (
 	github.com/ugorji/go/codec v1.2.8 // indirect
 	github.com/wumansgy/goEncrypt v1.0.0 // indirect
 	golang.org/x/crypto v0.5.0 // indirect
-	golang.org/x/net v0.5.0 // indirect
-	golang.org/x/sys v0.4.0 // indirect
-	golang.org/x/text v0.6.0 // indirect
+	golang.org/x/net v0.7.0 // indirect
+	golang.org/x/sys v0.5.0 // indirect
+	golang.org/x/text v0.7.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/gorm v1.24.3 // indirect
